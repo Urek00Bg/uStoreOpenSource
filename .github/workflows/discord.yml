@@ -1,0 +1,56 @@
+name: "Discord Push Notification"
+
+on:
+  push:
+    branches:
+      - "*"
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Discord embed payload
+        run: |
+          # Replace real newlines in commit message with literal \n
+          COMMIT_MSG="${{ github.event.head_commit.message }}"
+          COMMIT_MSG_ESCAPED=$(printf '%s' "$COMMIT_MSG" | sed ':a;N;$!ba;s/\n/\\n/g')
+
+          cat <<EOF > payload.json
+          {
+            "embeds": [
+              {
+                "title": "🆓 uStore openSource – New Update Pushed",
+                "color": 5814783,
+                "fields": [
+                  {
+                    "name": "Author",
+                    "value": "${{ github.actor }}",
+                    "inline": true
+                  },
+                  {
+                    "name": "Branch",
+                    "value": "${{ github.ref_name }}",
+                    "inline": true
+                  },
+                  {
+                    "name": "Commit Message",
+                    "value": "$COMMIT_MSG_ESCAPED"
+                  }
+                ],
+                "footer": {
+                  "text": "uStore openSource Auto Update Alert (https://github.com/Urek00Bg/uStoreOpenSource)"
+                },
+                "timestamp": "${{ github.event.head_commit.timestamp }}"
+              }
+            ]
+          }
+          EOF
+
+      - name: Send embed to Discord
+        env:
+          WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d @payload.json \
+               "$WEBHOOK"
