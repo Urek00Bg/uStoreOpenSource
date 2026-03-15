@@ -1,4 +1,6 @@
-In this repository you will find free and open-source scripts. Usually you won't find any large scripts here unless I accidentally posted one — but eh...
+## Most scripts would require **[OX_LIB, OX_MYSQL]** and are made for **QBCORE**
+
+In this repository you will find free and open-source scripts. Usually you won't find any large scripts here unless I accidentally posted one, but eh...
 
 More information can be found in each individual script's folder.
 
